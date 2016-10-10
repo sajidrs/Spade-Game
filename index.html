@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Team 2 - Killer Cut-throat Spades</title>
+    <meta name="description" content="Flat UI Kit Free is a Twitter Bootstrap Framework design and Theme, this responsive framework includes a PSD and HTML version."/>
+
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Loading Bootstrap -->
+    <link href="dist/css/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="dist/css/flat-ui.css" rel="stylesheet">
+    <link href="docs/assets/css/demo.css" rel="stylesheet">
+	
+    <link rel="shortcut icon" href="img/favicon.ico">
+	<link rel="stylesheet" type="text/css" media="all" href="playingCards.ui.css"/>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="playingCards.js"></script>
+    <script type="text/javascript" src="playingCards.ui.js"></script>
+	<script type="text/javascript">
+        $(document).ready(function(){
+            var cardDeck = $("#cardDeck").playingCards();
+            cardDeck.spread(); // show it
+
+			var currentDealer = 4;
+            var playerHand = [];
+			var bot1Hand = [];
+			var bot2Hand = [];
+			var bot3Hand = [];
+			
+            var showError = function(msg){
+                $('#error').html(msg).show();
+                setTimeout(function(){
+                    $('#error').fadeOut('slow');
+                },3000);
+            }
+            var showHands = function(){
+                var el = $('#yourHand')
+                el.html('');
+                for(var i=0;i<playerHand.length;i++){
+                    el.append(playerHand[i].getHTML());
+                }
+				var el = $('#bot1Hand')
+                el.html('');
+                for(var i=0;i<bot1Hand.length;i++){
+                    el.append(bot1Hand[i].getHTML());
+                }
+				var el = $('#bot2Hand')
+                el.html('');
+                for(var i=0;i<bot2Hand.length;i++){
+                    el.append(bot2Hand[i].getHTML());
+                }
+				var el = $('#bot3Hand')
+                el.html('');
+                for(var i=0;i<bot3Hand.length;i++){
+                    el.append(bot3Hand[i].getHTML());
+                }
+            }
+            var doShuffle = function(){
+                cardDeck.shuffle();
+                cardDeck.spread(); // update card table
+            }
+			
+			var doDeal = function(){
+				var i = 0;
+				while(i < 13){
+					var c1 = cardDeck.draw();
+					var c2 = cardDeck.draw();
+					var c3 = cardDeck.draw();
+					var c4 = cardDeck.draw();
+					if(!c1 || !c2 || !c3 || !c4){
+						showError('no more cards');
+						return;
+					}
+					playerHand[playerHand.length] = c1;
+					bot1Hand[bot1Hand.length] = c2;
+					bot2Hand[bot2Hand.length] = c3;
+					bot3Hand[bot3Hand.length] = c4;
+					cardDeck.spread();
+					showHands();
+					setDealer();
+					i++;
+				}
+			}
+			
+			var resetDeck = function(){
+				cardDeck = $("#cardDeck").playingCards();
+				playerHand = [];
+				bot1Hand = [];
+				bot2Hand = [];
+				bot3Hand = [];
+				cardDeck.spread();
+				showHands();
+				
+				var el = $('#dealerID');
+                el.html("");
+			}
+			
+			var setDealer = function(){
+				if(currentDealer == 4){
+					dealerString = "Player";
+					currentDealer = 1;
+				}
+				else{
+					dealerString = "AI " + currentDealer;
+					currentDealer++;
+				}
+				var el = $('#dealerID');
+                el.html(dealerString);
+			}
+			
+            $('#shuffler').click(doShuffle);
+            $('#dealer').click(doDeal);
+			$('#resetter').click(resetDeck);
+
+        });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="demo-headline">
+        <h1 class="demo-logo">
+          <div class="logo"></div>
+          Killer Cut Throat Spades
+          <small>Team 2</small>
+        </h1>
+      </div> <!-- /demo-headline -->
+	
+ 
+      	<div class="demo-title">
+      		<h3 class="demo-section-title">Menu</h3>
+      	</div>
+
+      <!-- MY STUFF-->
+      <div class="row demo-row">
+        <div class="col-xs-3">
+          <a href="#fakelink" class="btn btn-block btn-lg btn-primary" id="shuffler" value="Shuffle the Deck">Shuffle the Deck</a>
+        </div>
+        <div class="col-xs-3">
+          <a href="#fakelink" class="btn btn-block btn-lg btn-warning" id="dealer" value="Deal Cards">Deal Cards</a>
+        </div>
+        <div class="col-xs-3">
+          <a href="#fakelink" class="btn btn-block btn-lg btn-danger" id="resetter" value="Reset the Deck">Reset the Deck</a>
+        </div>
+      </div> <!-- /row -->	
+    
+		
+
+</div> <!-- /container -->
+
+ <div class= "poker-table">
+	<div class="col-md-8">
+		<h1  class="demo-section-title">Card Deck</h1>
+		<div id="cardDeck"></div>	
+		<h3 class="demo-panel-title">AI 1's Cards</h3>
+		<div id="bot1Hand"></div>
+		<h3 class="demo-panel-title">AI 2's Cards</h3>
+		<div id="bot2Hand"></div>
+		<h3 class="demo-panel-title">AI 3's Cards</h3>
+		<div id="bot3Hand"></div>
+		<h3 class="demo-panel-title">Player's Cards</h3>
+		<div id="yourHand"></div>
+	</div>
+	<div class="col-md-2">
+		<h1 class="demo-panel-title">Dealer: </h1>
+		<div id="dealerID"></div>
+	</div>
+	<div class="col-md-2"> <!-- /SCOREBOARD -->
+		<div class="todo">
+            <div class="todo-search">
+              <strong>SCOREBOARD </strong>
+            </div>
+            <ul>
+              <li>
+                <div class="todo-icon fui-user"></div>
+                <div class="todo-content">
+                  <h4 class="todo-name">
+                     <strong>AI 1</strong>
+                  </h4>
+                  0
+                </div>
+              </li>
+              <li>
+                <div class="todo-icon fui-user"></div>
+                <div class="todo-content">
+                  <h4 class="todo-name">
+                    <strong>AI 2</strong>
+                  </h4>
+                  0
+                </div>
+              </li>
+              <li>
+                <div class="todo-icon fui-user"></div>
+                <div class="todo-content">
+                  <h4 class="todo-name">
+                    <strong>AI 3</strong>
+                  </h4>
+                  0
+                </div>
+              </li>
+              <li>
+                <div class="todo-icon fui-user"></div>
+                <div class="todo-content">
+                  <h4 class="todo-name">
+                    <strong>Player</strong>
+                  </h4>
+                  0
+                </div>
+              </li>
+            </ul>
+          </div><!-- /.todo -->
+	</div>
+	<div class="col-md-1"></div>
+
+</div>
+ 
+    </div> <!-- /container -->
+
+
+  </body>
+</html>
