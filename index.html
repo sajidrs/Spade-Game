@@ -84,12 +84,31 @@
 					bot1Hand[bot1Hand.length] = c2;
 					bot2Hand[bot2Hand.length] = c3;
 					bot3Hand[bot3Hand.length] = c4;
-					cardDeck.spread();
-					showHands();
-					setDealer();
+//					cardDeck.spread();
+//                    setDealer();
+//                    showHands();
 					i++;
 				}
+                //sort by suit?
+                playerHand.sort(compareSuit);
+                
+                //moved the following three functions out of the loop
+                cardDeck.spread();
+                setDealer();
+                showHands();
 			}
+            
+            function compareSuit(a,b){
+                //S, D, C, H
+                
+                if(a.suit == b.suit)    return 0;
+                if(a.suit == "S")       return 1;
+                if(b.suit == "S")       return -1;
+                if(a.suit == "D" && (b.suit == "C" || b.suit == "H"))   return 1;
+                if(a.suit == "C" && b.suit == "H")                      return 1;
+                if(a.suit == "H" && (b.suit == "D" || b.suit == "C"))   return -1;
+                if(a.suit == "C" && b.suit == "D")                      return -1;
+            }
 		
 			var resetDeck = function(){
 				cardDeck = $("#cardDeck").playingCards();
