@@ -25,6 +25,7 @@
             cardDeck.spread(); // show it
 
 			var currentDealer = 4;
+			var currentLead = 1;
             		var playerHand = [];
 			var bot1Hand = [];
 			var bot2Hand = [];
@@ -39,25 +40,30 @@
             var showHands = function(){
                 var el = $('#yourHand')
                 el.html('');
-                for(var i=0;i<playerHand.length;i++){
+
+		for(var i=0;i<playerHand.length;i++){
                     el.append(playerHand[i].getHTML());
                 }
-				var el = $('#bot1Hand')
+		
+		var el = $('#bot1Hand')
                 el.html('');
                 for(var i=0;i<bot1Hand.length;i++){
                     el.append(bot1Hand[i].getHTML());
                 }
-				var el = $('#bot2Hand')
+		
+		var el = $('#bot2Hand')
                 el.html('');
                 for(var i=0;i<bot2Hand.length;i++){
                     el.append(bot2Hand[i].getHTML());
                 }
-				var el = $('#bot3Hand')
+
+		var el = $('#bot3Hand')
                 el.html('');
                 for(var i=0;i<bot3Hand.length;i++){
                     el.append(bot3Hand[i].getHTML());
                 }
             }
+
             var doShuffle = function(){
                 cardDeck.shuffle();
                 cardDeck.spread(); // update card table
@@ -84,7 +90,7 @@
 					i++;
 				}
 			}
-			
+		
 			var resetDeck = function(){
 				cardDeck = $("#cardDeck").playingCards();
 				playerHand = [];
@@ -102,18 +108,31 @@
 				if(currentDealer == 4){
 					dealerString = "Player";
 					currentDealer = 1;
+					leadString = "AI1";
 				}
 				else{
 					dealerString = "AI " + currentDealer;
 					currentDealer++;
+					if(currentDealer != 4){
+						leadString = "AI " + currentDealer;
+					}
+					else{
+						leadString = "Player";
+					}
 				}
+
+				
 				var el = $('#dealerID');
-                el.html(dealerString);
+		                el.html(dealerString);
+
+				var el = $('#leadID');
+				el.html(leadString);
 			}
-			
+		
+	
             $('#shuffler').click(doShuffle);
             $('#dealer').click(doDeal);
-			$('#resetter').click(resetDeck);
+	    $('#resetter').click(resetDeck);
 
         });
     </script>
@@ -181,6 +200,8 @@
 	<div class="col-md-2">
 		<h1 class="demo-panel-title">Dealer: </h1>
 		<div id="dealerID"></div>
+		<h1 class="demo-panel-title">Lead: </h1>
+		<div id="leadID"></div>
 	</div>
 	<div class="col-md-2"> <!-- /SCOREBOARD -->
 		<div class="todo">
