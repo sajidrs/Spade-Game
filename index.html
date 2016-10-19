@@ -26,6 +26,7 @@
 
 			var currentDealer = 4;
 			var currentLead = 1;
+			var tricksRemaining = 13;
             		var playerHand = [];
 			var bot1Hand = [];
 			var bot2Hand = [];
@@ -146,6 +147,9 @@
 
 				var el = $('#leadID');
 				el.html(leadString);
+
+				var el = $('#tricksRemaining');
+				el.html(tricksRemaining);
 			}
 		
 	
@@ -221,6 +225,8 @@
 		<div id="dealerID"></div>
 		<h1 class="demo-panel-title">Lead: </h1>
 		<div id="leadID"></div>
+		<h1 class="demo-panel-title">Tricks Remaining: </h1>
+		<div id="tricksRemaining"></div>
 	</div>
 	<div class="col-md-2"> <!-- /SCOREBOARD -->
 		<div class="todo">
