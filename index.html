@@ -29,6 +29,7 @@
 		var currentDealer = 4;
 		var currentLead = 1;
 		var tricksRemaining = 13;
+		var handSize = 13;
 
 		// Generate arrays for hands
       		var playerHand = [];
@@ -93,7 +94,7 @@
 		// Deal cards to start game
 		var doDeal = function(){
 			var i = 0;
-			while(i < 13){
+			while(i < handSize){
 				var c1 = cardDeck.draw();
 				var c2 = cardDeck.draw();
 				var c3 = cardDeck.draw();
