@@ -21,99 +21,203 @@
     <script type="text/javascript" src="playingCards.ui.js"></script>
 	<script type="text/javascript">
         $(document).ready(function(){
-            var cardDeck = $("#cardDeck").playingCards();
-            cardDeck.spread(); // show it
+		// Generate Card Deck
+        	var cardDeck = $("#cardDeck").playingCards();
+            	cardDeck.spread(); // show it
 
-			var currentDealer = 4;
-            var playerHand = [];
-			var bot1Hand = [];
-			var bot2Hand = [];
-			var bot3Hand = [];
+		// Generate tokens for Dealer, Leader, Tricks
+		var currentDealer = 4;
+		var currentLead = 1;
+		var tricksRemaining = 13;
+
+		// Generate arrays for hands
+      		var playerHand = [];
+		var bot1Hand = [];
+		var bot2Hand = [];
+		var bot3Hand = [];
+
+		// Added for trick playing functionality
+		var currentTable = [];
+		var graveyard = [];
+	
+		// Error handler
+            	var showError = function(msg){
+                	$('#error').html(msg).show();
+                	setTimeout(function(){
+                    		$('#error').fadeOut('slow');
+                	},3000);
+            	}
+
+		// Display hands
+            	var showHands = function(){
+                	var el = $('#yourHand')
+                	el.html('');
+			for(var i=0;i<playerHand.length;i++){
+                    		el.append(playerHand[i].getHTML());
+                	}
+		
+			var el = $('#bot1Hand')
+	                el.html('');
+        	        for(var i=0;i<bot1Hand.length;i++){
+        	        	el.append(bot1Hand[i].getHTML());
+                	}
+		
+			var el = $('#bot2Hand')
+                	el.html('');
+                	for(var i=0;i<bot2Hand.length;i++){
+                    		el.append(bot2Hand[i].getHTML());
+                	}
+
+			var el = $('#bot3Hand')
+                	el.html('');
+                	for(var i=0;i<bot3Hand.length;i++){
+                    		el.append(bot3Hand[i].getHTML());
+                	}
+            	}
+
+		// Show table
+		var showTable = function(){
+			var el = $('#currentTable')
+			el.html('');
+			for(var i=0;i<currentTable.length;i++){
+				el.append(currentTable[i].getHTML());
+			}
+		}
+
+		// Shuffle deck
+            	var doShuffle = function(){
+                	cardDeck.shuffle();
+                	cardDeck.spread();
+            	}
 			
-            var showError = function(msg){
-                $('#error').html(msg).show();
-                setTimeout(function(){
-                    $('#error').fadeOut('slow');
-                },3000);
-            }
-            var showHands = function(){
-                var el = $('#yourHand')
-                el.html('');
-                for(var i=0;i<playerHand.length;i++){
-                    el.append(playerHand[i].getHTML());
-                }
-				var el = $('#bot1Hand')
-                el.html('');
-                for(var i=0;i<bot1Hand.length;i++){
-                    el.append(bot1Hand[i].getHTML());
-                }
-				var el = $('#bot2Hand')
-                el.html('');
-                for(var i=0;i<bot2Hand.length;i++){
-                    el.append(bot2Hand[i].getHTML());
-                }
-				var el = $('#bot3Hand')
-                el.html('');
-                for(var i=0;i<bot3Hand.length;i++){
-                    el.append(bot3Hand[i].getHTML());
-                }
-            }
-            var doShuffle = function(){
-                cardDeck.shuffle();
-                cardDeck.spread(); // update card table
-            }
-			
-			var doDeal = function(){
-				var i = 0;
-				while(i < 13){
-					var c1 = cardDeck.draw();
-					var c2 = cardDeck.draw();
-					var c3 = cardDeck.draw();
-					var c4 = cardDeck.draw();
-					if(!c1 || !c2 || !c3 || !c4){
-						showError('no more cards');
-						return;
-					}
-					playerHand[playerHand.length] = c1;
-					bot1Hand[bot1Hand.length] = c2;
-					bot2Hand[bot2Hand.length] = c3;
-					bot3Hand[bot3Hand.length] = c4;
-					cardDeck.spread();
-					showHands();
-					setDealer();
-					i++;
+		// Deal cards to start game
+		var doDeal = function(){
+			var i = 0;
+			while(i < 13){
+				var c1 = cardDeck.draw();
+				var c2 = cardDeck.draw();
+				var c3 = cardDeck.draw();
+				var c4 = cardDeck.draw();
+				if(!c1 || !c2 || !c3 || !c4){
+					showError('no more cards');
+					return;
 				}
+				playerHand[playerHand.length] = c1;
+				bot1Hand[bot1Hand.length] = c2;
+				bot2Hand[bot2Hand.length] = c3;
+				bot3Hand[bot3Hand.length] = c4;
+				i++;
 			}
-			
-			var resetDeck = function(){
-				cardDeck = $("#cardDeck").playingCards();
-				playerHand = [];
-				bot1Hand = [];
-				bot2Hand = [];
-				bot3Hand = [];
-				cardDeck.spread();
-				showHands();
+        	        playerHand.sort(compareRank);
+			playerHand.sort(compareSuit);
+        	        cardDeck.spread();
+        	        setDealer();
+        	        showHands();
+		}
+
+		// Resets card deck and hands
+		var resetDeck = function(){
+			cardDeck = $("#cardDeck").playingCards();
+			playerHand = [];
+			bot1Hand = [];
+			bot2Hand = [];
+			bot3Hand = [];
+			currentTable = [];
+			cardDeck.spread();
+			showHands();
+			showTable();
 				
-				var el = $('#dealerID');
-                el.html("");
+			var el = $('#dealerID');
+                	el.html("");
+		}
+		
+		// Sets dealer, lead tokens
+		var setDealer = function(){
+			if(currentDealer == 4){
+				dealerString = "Player";
+				currentDealer = 1;
+				leadString = "AI1";
 			}
-			
-			var setDealer = function(){
-				if(currentDealer == 4){
-					dealerString = "Player";
-					currentDealer = 1;
+			else{
+				dealerString = "AI " + currentDealer;
+				currentDealer++;
+				if(currentDealer != 4){
+					leadString = "AI " + currentDealer;
 				}
 				else{
-					dealerString = "AI " + currentDealer;
-					currentDealer++;
+					leadString = "Player";
 				}
-				var el = $('#dealerID');
-                el.html(dealerString);
+			}
+			tricksRemaining = 13;
+
+			var el = $('#dealerID');
+			el.html(dealerString);
+
+			var el = $('#leadID');
+			el.html(leadString);
+
+			var el = $('#tricksRemaining');
+			el.html(tricksRemaining);
+		}
+
+		var playCard = function(){
+			for(var i=0; i < currentTable.length; i++){
+				graveyard[graveyard.length] = currentTable.pop();
 			}
 			
-            $('#shuffler').click(doShuffle);
-            $('#dealer').click(doDeal);
-			$('#resetter').click(resetDeck);
+			currentTable = [];
+			// TODO: Include functions for AI, player to pick cards
+			currentTable[currentTable.length] = bot1Hand.pop();
+			currentTable[currentTable.length] = bot2Hand.pop();
+			currentTable[currentTable.length] = bot3Hand.pop();
+			currentTable[currentTable.length] = playerHand.pop();
+			// TODO: Include functions to calculate winner of trick
+			showTable();
+			showHands();
+			tricksRemaining--;
+			var el = $('#tricksRemaining');
+			el.html(tricksRemaining);
+		}
+            
+		// Compare suits to sort cards in hand
+            	function compareSuit(b,a){
+                	//S, H, C, D
+                	if(a.suit == b.suit)    return 0;
+                	if(a.suit == "S")       return 1;
+	                if(b.suit == "S")       return -1;
+        	        if(a.suit == "H" && (b.suit == "C" || b.suit == "D"))   return 1;
+        	        if(a.suit == "C" && b.suit == "D")                      return 1;
+        	        if(a.suit == "D" && (b.suit == "H" || b.suit == "C"))   return -1;
+        	        if(a.suit == "C" && b.suit == "H")                      return -1;
+            	}
+
+		// Compare ranks to sort cards in hand
+		function compareRank(b,a) {
+		        var intRegex = /^\d+$/;
+
+		        if (a.rank == b.rank)                       return 0;
+		        if (a.rank == "A")                          return 1;
+        		if (b.rank == "A")                          return -1;
+		        if (!isNaN(a.rank - b.rank))                return a.rank - b.rank;
+		        if (a.rank == "K" && b.rank == "J")         return 1;
+		        if (a.rank == "J" && b.rank == "K")         return -1;
+		        if (a.rank == "K" && b.rank == "Q")         return 1;
+		        if (a.rank == "Q" && b.rank == "K")         return -1;
+		        if (a.rank == "Q" && b.rank == "J")         return 1;
+		        if (a.rank == "J" && b.rank == "Q")         return -1;
+		        if (a.rank == "K" && intRegex.test(b.rank)) return 1;
+		        if (a.rank == "Q" && intRegex.test(b.rank)) return 1;
+		        if (a.rank == "J" && intRegex.test(b.rank)) return 1;
+		        if (intRegex.test(a.rank) && b.rank == "K") return -1;
+		        if (intRegex.test(a.rank) && b.rank == "Q") return -1;
+		        if (intRegex.test(a.rank) && b.rank == "J") return -1;
+		}
+	
+		// Button links to shuffle, deal, reset deck
+            	$('#shuffler').click(doShuffle);
+            	$('#dealer').click(doDeal);
+	    	$('#resetter').click(resetDeck);
+		$('#player').click(playCard);
 
         });
     </script>
@@ -159,6 +263,9 @@
         <div class="col-xs-3">
           <a href="#fakelink" class="btn btn-block btn-lg btn-danger" id="resetter" value="Reset the Deck">Reset the Deck</a>
         </div>
+	<div class="col-xs-3">
+          <a href="#fakelink" class="btn btn-block btn-lg btn-primary" id="player" value="Play Card">Play Card</a>
+        </div>
       </div> <!-- /row -->	
     
 		
@@ -188,10 +295,16 @@
 		<div id="bot3Hand"></div>
 		<h3 class="demo-panel-title">Mark's Card Deck</h3>
 		<div id="yourHand"></div>
+		<h3 class="demo-panel-title">Card Table</h3>
+		<div id="currentTable"></div>
 	</div>
 	<div class="col-md-2">
 		<h1 class="demo-panel-title">Dealer: </h1>
 		<div id="dealerID"></div>
+		<h1 class="demo-panel-title">Lead: </h1>
+		<div id="leadID"></div>
+		<h1 class="demo-panel-title">Tricks Remaining: </h1>
+		<div id="tricksRemaining"></div>
 	</div>
 	<div class="col-md-2"> <!-- /SCOREBOARD -->
 		<div class="todo">
